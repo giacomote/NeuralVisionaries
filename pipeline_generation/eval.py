@@ -19,47 +19,28 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from pipeline_baseline.pipeline import BaselinePipe
+from pipeline_generation.pipeline import GenerationPipe
 from metrics.subject_metrics import SubjectMetrics
 from metrics.dataset_metrics import DatasetMetrics
 
-from pipeline_baseline.config.evaluation_config import EvaluationConfig
+from pipeline_generation.config.evaluation_config import EvaluationConfig
 
 
-def train_and_generate_for_subject(
+def generate_for_subject(
     subject_name: str,
-    token_identifier: str,
-    data_dir: str,
-    training_prompt: str,
+    class_token: str,
     test_prompts: list[str],
     samples_per_prompt: int,
-    adaptation_dir: str,
-    subject_gen_dir: str
+    subject_gen_dir: str,
+    pipeline: GenerationPipe,
 ) -> str:
 
-    print(f'\n--- Training and generating on subject \'{subject_name}\' ---\n')
-
-    assert os.path.exists(data_dir), f'[ERROR] Data folder ({data_dir}) not found'
-
-    print(f'[TG 1/2] Fine-Tuning (LoRA)...\n')
-    pipe = BaselinePipe()
-
-    pipe.fine_tuning_lora(
-        image_folder=data_dir,
-        output_dir=adaptation_dir,
-        instance_prompt=training_prompt,
-        max_train_steps=1200,
-        learning_rate=1e-4
-    )
-    
-    weights_path = os.path.join(adaptation_dir, 'base_lora_weights.safetensors')
-    assert os.path.exists(weights_path), f'({weights_path}) No adaptation weights found'
+    print(f'\n--- Generating on subject \'{subject_name}\' ---\n')
 
     # Freeing up GPU memory before inference
     gc.collect()
     torch.cuda.empty_cache()
 
-    print(f'\n[TG 2/2] Generating images...\n')
     subject_gen_dir = os.path.join(subject_gen_dir, subject_name)
     os.makedirs(subject_gen_dir, exist_ok=True)
 
@@ -68,9 +49,8 @@ def train_and_generate_for_subject(
         for s_idx in range(samples_per_prompt):
             output_filename = os.path.join(subject_gen_dir, f'sample_P{p_idx}_S{s_idx}.png')
             
-            pipe.generate_personalized_image(
-                lora_dir=adaptation_dir,
-                prompt=prompt.format(token_identifier),
+            pipeline.generate_image(
+                prompt=prompt.format(class_token),
                 output_filename=output_filename
             )
             
@@ -157,6 +137,7 @@ def evaluate_dataset_metrics(
 
 
 if __name__ == '__main__':
+    pipe = GenerationPipe()
     subject_evaluator = SubjectMetrics()
     
     dataset_clip_t_scores = []
@@ -178,26 +159,20 @@ if __name__ == '__main__':
         else:
             test_prompts = EvaluationConfig.generation_prompts_object
 
-        placeholder_token = EvaluationConfig.placeholder_token
-        class_token = EvaluationConfig.subject_cfgs[subject_idx]['class_token']
-        token_identifier = f'{placeholder_token} {class_token}'
-
         # Training the model and generating images for each subject
-        subject_gen_dir = train_and_generate_for_subject(
+        subject_gen_dir = generate_for_subject(
             subject_name=subject_name,
-            token_identifier=token_identifier,
-            data_dir=data_dir,
-            training_prompt=EvaluationConfig.training_prompts[subject_idx],
+            class_token=EvaluationConfig.subject_cfgs[subject_idx]['class_token'],
             test_prompts=test_prompts,
             samples_per_prompt=EvaluationConfig.samples_per_prompt,
-            adaptation_dir=EvaluationConfig.adaptation_dir,
-            subject_gen_dir=EvaluationConfig.generation_dir
+            subject_gen_dir=EvaluationConfig.generation_dir,
+            pipeline=pipe
         )
 
         # Computing subject metrics
         sub_clip_t, sub_clip_i, sub_dino_i, sub_lpips = evaluate_subject_metrics(
             subject_name=subject_name,
-            class_token=class_token,
+            class_token=EvaluationConfig.subject_cfgs[subject_idx]['class_token'],
             data_dir=data_dir,
             subject_gen_dir=subject_gen_dir,
             test_prompts=test_prompts,

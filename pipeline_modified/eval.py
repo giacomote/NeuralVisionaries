@@ -135,7 +135,6 @@ def evaluate_subject_metrics(
     print(f' - Avg LPIPS (Image)  : {mean_lpips:.4f}')
     print('--------------------------------------------------')
 
-
     return mean_clip_t, mean_clip_i, mean_dino_i, mean_lpips
 
 
@@ -180,7 +179,7 @@ if __name__ == '__main__':
             test_prompts = EvaluationConfig.generation_prompts_object
 
         placeholder_token = EvaluationConfig.placeholder_token
-        class_token = EvaluationConfig.subject_cfgs[subject_idx]["class_token"]
+        class_token = EvaluationConfig.subject_cfgs[subject_idx]['class_token']
         token_identifier = f'{placeholder_token} {class_token}'
 
         # Training the model and generating images for each subject

@@ -8,7 +8,7 @@
 #SBATCH --account=cvcs2026
 #SBATCH --partition=boost_usr_prod
 #SBATCH --gres=gpu:1
-#SBATCH --time=16:00:00
+#SBATCH --time=17:00:00
 #SBATCH --mem=64G
 #SBATCH --constraint="gpu_A40_45G|gpu_L40S_45G"
 #SBATCH --output=logs/%x_%j.out
@@ -31,11 +31,13 @@ MODE=$1
 
 if [ "$MODE" == "baseline" ]; then
     TARGET_FILE="pipeline_baseline/eval.py"
+elif [ "$MODE" == "generation" ]; then
+    TARGET_FILE="pipeline_generation/eval.py"
 elif [ "$MODE" == "modified" ]; then
     TARGET_FILE="pipeline_modified/eval.py"
 else
     echo "[ERROR] Missing mode specification" >&2
-    echo "Usage: sbatch $0 [baseline|modified]" >&2
+    echo "Usage: sbatch $0 [baseline|modified|generation]" >&2
     exit 1
 fi
 

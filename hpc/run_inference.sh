@@ -31,11 +31,13 @@ MODE=$1
 
 if [ "$MODE" == "baseline" ]; then
     TARGET_FILE="pipeline_baseline/infer.py"
+elif [ "$MODE" == "generation" ]; then
+    TARGET_FILE="pipeline_generation/infer.py"
 elif [ "$MODE" == "modified" ]; then
     TARGET_FILE="pipeline_modified/infer.py"
 else
     echo "[ERROR] Missing mode specification" >&2
-    echo "Usage: sbatch $0 [baseline|modified]" >&2
+    echo "Usage: sbatch $0 [baseline|modified|generation]" >&2
     exit 1
 fi
 
