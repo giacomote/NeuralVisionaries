@@ -15,15 +15,15 @@ warnings.filterwarnings(category=UserWarning, action='ignore')
 warnings.filterwarnings(category=FutureWarning, action='ignore')
 
 # Loading local files
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from pipeline_baseline.pipeline import BaselinePipe
+from pipelines.lora_baseline.pipeline import LoRABaseline
 from metrics.subject_metrics import SubjectMetrics
 from metrics.dataset_metrics import DatasetMetrics
 
-from pipeline_baseline.config.evaluation_config import EvaluationConfig
+from pipelines.lora_baseline.config.evaluation_config import EvaluationConfig
 
 
 def train_and_generate_for_subject(
@@ -42,7 +42,7 @@ def train_and_generate_for_subject(
     assert os.path.exists(data_dir), f'[ERROR] Data folder ({data_dir}) not found'
 
     print(f'[TG 1/2] Fine-Tuning (LoRA)...\n')
-    pipe = BaselinePipe()
+    pipe = LoRABaseline()
 
     pipe.fine_tuning_lora(
         image_folder=data_dir,
@@ -52,8 +52,7 @@ def train_and_generate_for_subject(
         learning_rate=1e-4
     )
     
-    weights_path = os.path.join(adaptation_dir, 'base_lora_weights.safetensors')
-    assert os.path.exists(weights_path), f'({weights_path}) No adaptation weights found'
+    pipe.check_saved_weights(adaptation_dir=adaptation_dir)
 
     # Freeing up GPU memory before inference
     gc.collect()

@@ -8,17 +8,15 @@ visual consistency across different contexts and scenarios.
 
 ## Overview
 
-This project implements **two distinct pipelines** for subject-driven image generation:
-- **Baseline LoRA Pipeline**: The reference implementation that establishes the foundational approach to subject-driven
+This project implements **3 distinct pipelines** for subject-driven image generation:
+- **Generation Only**: An unpersonalized pipeline (useful to compare the personalization results)
+- **LoRA Baseline**: The reference LoRA implementation that establishes the foundational approach to subject-driven 
   generation, providing a solid baseline for comparison and evaluation.
-- **Modified LoRA Pipeline**: An experimental variant built upon the baseline pipeline, incorporating a data
-  augmentation stage to increase the number of the subject images used during training.
+- **LoRA Custom**: An experimental variant built upon the *LoRA Baseline* pipeline, incorporating a data augmentation
+  stage to increase the number of subject images used during training.
 
-> [!NOTE]
-> The modifications in *Modified Pipeline* are purely experimental in nature; while they aim to improve results, there
-> is no guarantee that they will consistently outperform the baseline approach.
-
-Both pipelines follow the same workflow (training, inference, and evaluation) and can be used independently.
+All the pipelines (except *Generation Only*) follow the same workflow (training, inference, and evaluation) and can be
+used independently.
 
 ## 📜 Author & License
 
@@ -49,12 +47,10 @@ file.
     ├── data/                 # Datasets (create this directory before use)
     ├── hpc/                  # Scripts for running experiments on HPC clusters
     ├── metrics/              # Evaluation metrics
-    ├── pipeline_baseline/    # "Baseline LoRA" pipeline
-    │   ├── config/           # Configuration files
-    │   └── ...
-    ├── pipeline_modified/    # "Modified LoRA" pipeline
-    │   ├── config/           # Configuration files
-    │   └── ...
+    ├── pipelines/
+    │   ├── gen_only/
+    │   ├── lora_baseline/
+    │   └── lora_custom/
     ├── .gitignore
     ├── LICENSE
     ├── README.md
@@ -64,6 +60,10 @@ file.
 > Some more folders are automatically created while running project scripts.  
 > Those folders are needed to save results and temporary files.  
 > All of them are specified in the pipelines configurations files.
+
+> [!NOTE]
+> Pipeline configuration files are located inside the relative pipeline `config/` folder.  
+> Please check them before running any experiment.
 
 ## 🛠️ Installation
 
@@ -104,15 +104,15 @@ In this case, only the `data/` directory is required before running the project.
 
 ### 1. Dataset Preparation
 
-#### Training & Inference
+#### Training & Inference Experiments
 
-For **training and inference**, place **5–10 images** of your target subject directly in the `data/` directory.  
+For **training and inference**, place **4-6 images** of your target subject directly in the `data/` directory.  
 For optimal results, use images featuring varied angles, lighting conditions, and backgrounds.
 
-#### Evaluation
+#### Evaluation Experiments
 
 For **evaluation**, organize the dataset into **separate subdirectories**, with one subdirectory per subject.  
-Each subject should contain 5–10 images of that subject.
+Each subject should contain 4-6 images of that subject.
 
 For example:
 
@@ -134,12 +134,9 @@ subject, generates the corresponding images, and computes the evaluation metrics
 ### 2. Check Configuration
 
 Before running training or inference or launch an evaluation experiment, review the configuration files located in the
-respective pipeline directories:
+respective pipeline `config/` directories.
 
-```text
-pipeline_baseline/config/
-pipeline_modified/config/
-```
+If you intend to launch the experiment on a remote HPC cluster, please check the launch scripts in the `hpc/` directory.
 
 ### 3a. Training & Inference
 
@@ -150,32 +147,23 @@ same subject.
 The training step only needs to be performed once for each subject.  
 Afterward, the trained model can be reused to generate as many image variations as needed.
 
+> [!NOTE]
+> As it is unpersonalized, *Generation Only* pipeline **does not have a training script**.
+
 #### Local Execution
 
 ```bash
 >> cd <clone_dir>/Subject2Image  # Place yourself at the root of the repository
->> python pipeline_baseline/train.py
->> python pipeline_baseline/infer.py
-
-# OR
-
->> cd <clone_dir>/Subject2Image
->> python pipeline_modified/train.py
->> python pipeline_modified/infer.py
+>> python pipelines/<specific_pipeline_dir>/train.py
+>> python pipelines/<specific_pipeline_dir>/infer.py
 ```
 
 #### HPC Cluster Execution
 
 ```bash
 >> cd <clone_dir>/Subject2Image  # Place yourself at the root of the repository
->> sbatch hpc/run_training.sh baseline
->> sbatch hpc/run_inference.sh baseline
-
-# OR
-
->> cd <clone_dir>/Subject2Image
->> sbatch hpc/run_training.sh modified
->> sbatch hpc/run_inference.sh modified
+>> sbatch hpc/run_training.sh <pipeline_dir_name>
+>> sbatch hpc/run_inference.sh <pipeline_dir_name>
 ```
 
 ### 3b. Evaluation
@@ -193,24 +181,14 @@ requiring manual training and inference for each one.
 
 ```bash
 >> cd <clone_dir>/Subject2Image  # Place yourself at the root of the repository
->> python pipeline_baseline/eval.py
-
-# OR
-
->> cd <clone_dir>/Subject2Image
->> python pipeline_modified/eval.py
+>> python pipelines/<specific_pipeline_dir>/eval.py
 ```
 
 #### HPC Cluster Execution
 
 ```bash
 >> cd <clone_dir>/Subject2Image  # Place yourself at the root of the repository
->> sbatch hpc/run_evaluation.sh baseline
-
-# OR
-
->> cd <clone_dir>/Subject2Image
->> sbatch hpc/run_evaluation.sh modified
+>> sbatch hpc/run_evaluation.sh <pipeline_dir_name>
 ```
 
 ## 📈 Results

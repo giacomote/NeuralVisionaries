@@ -15,15 +15,15 @@ warnings.filterwarnings(category=UserWarning, action='ignore')
 warnings.filterwarnings(category=FutureWarning, action='ignore')
 
 # Loading local files
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from pipeline_generation.pipeline import GenerationPipe
+from pipelines.gen_only.pipeline import GenerationPipe
 from metrics.subject_metrics import SubjectMetrics
 from metrics.dataset_metrics import DatasetMetrics
 
-from pipeline_generation.config.evaluation_config import EvaluationConfig
+from pipelines.gen_only.config.evaluation_config import EvaluationConfig
 
 
 def generate_for_subject(

@@ -7,7 +7,7 @@ class EvaluationConfig:
     # They can be either absolute paths or relative paths (starting from the repository folder)
     data_dir = 'data/'
     adaptation_dir = 'adaptation_evaluation/'
-    generation_dir = 'images_evaluation/modified_lora/'  # Generated images used during the evaluation process
+    generation_dir = 'images_evaluation/lora_custom/'  # Generated images used during the evaluation process
     
     subject_cfgs = [
         { 'class_token': 'backpack', 'living': False },

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 srun -Q -J debug \
-    -w ailb-login-03 \
+    -w <node_name> \
     --immediate=20 \
-    --partition=all_serial \
+    --partition=<partition_name> \
     --gres=gpu:1 \
     --time=00:10:00 \
-    --account=cvcs2026 \
+    --account=<account_name> \
     --pty /bin/bash

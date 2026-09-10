@@ -12,14 +12,18 @@ from diffusers.optimization import get_cosine_schedule_with_warmup
 from peft import LoraConfig, get_peft_model, get_peft_model_state_dict
 from safetensors.torch import save_file
 
-from pipeline_modified.custom_dataset import CustomDataset
+from pipelines.lora_custom.custom_dataset import CustomDataset
 
 
-class ModifiedPipe:
+class LoRACustom:
     def __init__(self):
             self._model_id = 'stabilityai/stable-diffusion-3.5-large'
             self._weight_name = 'mod_lora_weights.safetensors'
             self._inference_pipe = None
+
+    def check_saved_weights(self, adaptation_dir):
+        weights_path = os.path.join(adaptation_dir, self._weight_name)
+        assert os.path.exists(weights_path), f'({weights_path}) No adaptation weights found'
     
     def _free_inference_memory(self):
         if self._inference_pipe is not None:

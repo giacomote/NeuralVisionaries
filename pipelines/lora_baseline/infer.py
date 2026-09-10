@@ -4,12 +4,12 @@ import sys
 from pathlib import Path
 
 # Loading local files
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from pipeline_generation.pipeline import GenerationPipe
-from pipeline_generation.config.pipeline_config import PipelineConfig
+from pipelines.lora_baseline.pipeline import LoRABaseline
+from pipelines.lora_baseline.config.pipeline_config import PipelineConfig
 
 
 if __name__ == '__main__':
@@ -18,10 +18,12 @@ if __name__ == '__main__':
     subject_id = PipelineConfig.data_dir.split('/')[-1]
     output_file = PipelineConfig.results_dir + str(len(os.listdir(PipelineConfig.results_dir))) + '_' + subject_id + '.png'
 
-    generation_prompt = PipelineConfig.generation_prompt.format(PipelineConfig.class_token)
+    token_identifier = f'{PipelineConfig.placeholder_token} {PipelineConfig.class_token}'
+    generation_prompt = PipelineConfig.generation_prompt.format(token_identifier)
 
-    pipe = GenerationPipe()
+    pipe = LoRABaseline()
     pipe.generate_personalized_image(
+        lora_dir=PipelineConfig.adaptation_dir,
         prompt=generation_prompt,
         output_filename=output_file
     )

@@ -5,12 +5,12 @@
 # ============================================================
 
 #SBATCH --job-name=s2i-infer
-#SBATCH --account=cvcs2026
-#SBATCH --partition=boost_usr_prod
+#SBATCH --account=<account_name>
+#SBATCH --partition=<partition_name>
 #SBATCH --gres=gpu:1
 #SBATCH --time=00:30:00
 #SBATCH --mem=64G
-#SBATCH --constraint="gpu_A40_45G|gpu_L40S_45G"
+#SBATCH --constraint=<constraints>  # At least 45 GB VRAM
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
@@ -28,18 +28,15 @@ fi
 # ============================================================
 
 MODE=$1
+MODE="${MODE,,}"
 
-if [ "$MODE" == "baseline" ]; then
-    TARGET_FILE="pipeline_baseline/infer.py"
-elif [ "$MODE" == "generation" ]; then
-    TARGET_FILE="pipeline_generation/infer.py"
-elif [ "$MODE" == "modified" ]; then
-    TARGET_FILE="pipeline_modified/infer.py"
-else
+if [[ "$MODE" != "gen_only" && "$MODE" != "lora_baseline" && "$MODE" != "lora_custom" ]]; then
     echo "[ERROR] Missing mode specification" >&2
-    echo "Usage: sbatch $0 [baseline|modified|generation]" >&2
+    echo "Usage: sbatch $0 [gen_only|lora_baseline|lora_custom]" >&2
     exit 1
 fi
+
+TARGET_FILE="pipelines/$MODE/infer.py"
 
 # ============================================================
 # Preliminary operations
@@ -51,15 +48,15 @@ export PYTHONUNBUFFERED=1
 export TQDM_DISABLE=1
 export HF_HUB_DISABLE_PROGRESS_BARS=1
 
-export HF_HOME="/work/cvcs2026/neural_visionaries/.hf_cache"
+export HF_HOME="~/.cache/huggingface/hf_cache"
 export HF_TOKEN_PATH="~/.cache/huggingface/token"
 
 mkdir -p $HF_HOME
 mkdir -p logs
 
 module purge
-module load cuda/12.6.3
-module load python/3.11.15
+module load cuda/12.6.3  # Change if different versions are installed on the cluster
+module load python/3.11.15  # Change if different versions are installed on the cluster
 
 cd $SLURM_SUBMIT_DIR
 source .venv/bin/activate

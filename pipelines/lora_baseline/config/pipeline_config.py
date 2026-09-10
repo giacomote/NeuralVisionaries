@@ -8,7 +8,7 @@ class PipelineConfig:
     # They can be either absolute paths or relative paths (starting from the repository folder)
     data_dir = 'data/cat/'
     adaptation_dir = 'adaptation_inference/'
-    results_dir = 'images_inference/modified_lora/'
+    results_dir = 'images_inference/lora_baseline/'
 
     placeholder_token = '<sks>'
     class_token = 'cat'

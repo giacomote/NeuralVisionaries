@@ -6,8 +6,7 @@ class EvaluationConfig:
     # Folder names must end with a '/' character
     # They can be either absolute paths or relative paths (starting from the repository folder)
     data_dir = 'data/'
-    adaptation_dir = 'adaptation_evaluation/'
-    generation_dir = 'images_evaluation/baseline_lora/'  # Generated images used during the evaluation process
+    generation_dir = 'images_evaluation/gen_only/'  # Generated images used during the evaluation process
 
     subject_cfgs = [
         { 'class_token': 'backpack', 'living': False },
@@ -41,12 +40,6 @@ class EvaluationConfig:
         { 'class_token': 'vase', 'living': False },
         { 'class_token': 'stuffed animal', 'living': False }
     ]
-
-    placeholder_token = '<sks>'
-    
-    training_prompts = []
-    for cfg in subject_cfgs:
-        training_prompts.append(f'A photo of {placeholder_token} {cfg["class_token"]}')
 
     generation_prompts_live = [  # Keep the number of prompts the same as for 'generation_prompts_object'
         'A high quality studio photograph of {0} sitting on a sofa',

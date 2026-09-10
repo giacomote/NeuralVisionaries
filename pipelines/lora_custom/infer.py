@@ -4,12 +4,12 @@ import sys
 from pathlib import Path
 
 # Loading local files
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from pipeline_baseline.pipeline import BaselinePipe
-from pipeline_baseline.config.pipeline_config import PipelineConfig
+from pipelines.lora_custom.pipeline import LoRACustom
+from pipelines.lora_custom.config.pipeline_config import PipelineConfig
 
 
 if __name__ == '__main__':
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     token_identifier = f'{PipelineConfig.placeholder_token} {PipelineConfig.class_token}'
     generation_prompt = PipelineConfig.generation_prompt.format(token_identifier)
 
-    pipe = BaselinePipe()
+    pipe = LoRACustom()
     pipe.generate_personalized_image(
         lora_dir=PipelineConfig.adaptation_dir,
         prompt=generation_prompt,
