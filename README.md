@@ -14,6 +14,7 @@ This project implements **3 distinct pipelines** for subject-driven image genera
   generation, providing a solid baseline for comparison and evaluation.
 - **LoRA Custom**: An experimental variant built upon the *LoRA Baseline* pipeline, incorporating a data augmentation
   stage to increase the number of subject images used during training.
+- **TI Custom**: An experimental Textual Inversion pipeline, based on Stable Diffusion 3.5.
 
 All the pipelines (except *Generation Only*) follow the same workflow (training, inference, and evaluation) and can be
 used independently.
@@ -50,7 +51,8 @@ file.
     ├── pipelines/
     │   ├── gen_only/
     │   ├── lora_baseline/
-    │   └── lora_custom/
+    │   ├── lora_custom/
+    │   └── ti_custom/
     ├── .gitignore
     ├── LICENSE
     ├── README.md

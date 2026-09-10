@@ -30,9 +30,9 @@ fi
 MODE=$1
 MODE="${MODE,,}"
 
-if [[ "$MODE" != "gen_only" && "$MODE" != "lora_baseline" && "$MODE" != "lora_custom" ]]; then
+if [[ "$MODE" != "gen_only" && "$MODE" != "lora_baseline" && "$MODE" != "lora_custom" && "$MODE" != "ti_custom" ]]; then
     echo "[ERROR] Missing mode specification" >&2
-    echo "Usage: sbatch $0 [gen_only|lora_baseline|lora_custom]" >&2
+    echo "Usage: sbatch $0 [gen_only|lora_baseline|lora_custom|ti_custom]" >&2
     exit 1
 fi
 
